@@ -1,0 +1,246 @@
+---
+version: '2'
+services:
+  zookeeper-1:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper-1
+    hostname: zookeeper-1
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181      
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
+      ZOOKEEPER_AUTH_PROVIDER_X509: org.apache.zookeeper.server.auth.X509AuthenticationProvider
+      ZOOKEEPER_SERVER_CNXN_FACTORY: org.apache.zookeeper.server.NettyServerCnxnFactory
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.zookeeper0.truststore.jks
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.zookeeper0.keystore.jks
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_KEYSTORE_FILENAME: 'kafka.zookeeper0.keystore.jks'
+      ZOOKEEPER_SSL_KEYSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SSL_TRUSTSTORE_FILENAME: 'kafka.zookeeper0.truststore.jks'
+      ZOOKEEPER_SSL_TRUSTSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SSL_KEY_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SET_ACL: true
+
+      ZOOKEEPER_SSL_CLIENT_AUTH: need
+      ZOOKEEPER_CLIENT_SECURE: true
+      ZOOKEEPER_CLIENT_CNXN_FACTORY: org.apache.zookeeper.ClientCnxnSocketNetty
+    ports:
+      - 22181:2181
+    volumes:
+      - /Users/wojdylakjr/Erasmus2023/CloudComputing/Project/security/ssl:/etc/kafka/secrets
+
+
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper-2
+    hostname: zookeeper-2
+    environment:
+      ZOOKEEPER_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181      
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
+      ZOOKEEPER_AUTH_PROVIDER_X509: org.apache.zookeeper.server.auth.X509AuthenticationProvider
+      ZOOKEEPER_SERVER_CNXN_FACTORY: org.apache.zookeeper.server.NettyServerCnxnFactory
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.zookeeper1.truststore.jks
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.zookeeper1.keystore.jks
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_KEYSTORE_FILENAME: 'kafka.zookeeper1.keystore.jks'
+      ZOOKEEPER_SSL_KEYSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SSL_TRUSTSTORE_FILENAME: 'kafka.zookeeper1.truststore.jks'
+      ZOOKEEPER_SSL_TRUSTSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SSL_KEY_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SET_ACL: true
+
+      ZOOKEEPER_SSL_CLIENT_AUTH: need
+      ZOOKEEPER_CLIENT_SECURE: true
+      ZOOKEEPER_CLIENT_CNXN_FACTORY: org.apache.zookeeper.ClientCnxnSocketNetty
+    ports:
+      - 32181:2181
+    volumes:
+      - /Users/wojdylakjr/Erasmus2023/CloudComputing/Project/security/ssl:/etc/kafka/secrets
+
+
+  zookeeper-3:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper-3
+    hostname: zookeeper-3
+    environment:
+      ZOOKEEPER_SERVER_ID: 3
+      ZOOKEEPER_CLIENT_PORT: 2181      
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SERVERS: zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888
+      ZOOKEEPER_AUTH_PROVIDER_X509: org.apache.zookeeper.server.auth.X509AuthenticationProvider
+      ZOOKEEPER_SERVER_CNXN_FACTORY: org.apache.zookeeper.server.NettyServerCnxnFactory
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.zookeeper2.truststore.jks
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.zookeeper2.keystore.jks
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_KEYSTORE_FILENAME: 'kafka.zookeeper2.keystore.jks'
+      ZOOKEEPER_SSL_KEYSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SSL_TRUSTSTORE_FILENAME: 'kafka.zookeeper2.truststore.jks'
+      ZOOKEEPER_SSL_TRUSTSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SSL_KEY_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SET_ACL: true
+
+      ZOOKEEPER_SSL_CLIENT_AUTH: need
+      ZOOKEEPER_CLIENT_SECURE: true
+      ZOOKEEPER_CLIENT_CNXN_FACTORY: org.apache.zookeeper.ClientCnxnSocketNetty
+    ports:
+      - 42181:2181
+    volumes:
+      - /Users/wojdylakjr/Erasmus2023/CloudComputing/Project/security/ssl:/etc/kafka/secrets
+  
+  kafka-1:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-1:9092, EXTERNAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SSL,EXTERNAL:SSL
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+
+      KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka0.keystore.jks
+      KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka0.truststore.jks
+      KAFKA_SSL_KEYSTORE_PASSWORD: QV9F(HOhfkjs*
+      KAFKA_SSL_TRUSTSTORE_PASSWORD: QV9F(HOhfkjs*
+      KAFKA_SSL_PASSWORD: QV9F(HOhfkjs*
+      KAFKA_SECURITY_PROTOCOL: SSL
+      SECURITY_PROTOCOL: SSL
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: " "
+      KAFKA_CONFLUENT_HTTP_SERVER_LISTENERS: " "
+      KAFKA_SSL_KEYSTORE_FILENAME: 'kafka.kafka0.keystore.jks'
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: credentials.txt
+      KAFKA_SSL_TRUSTSTORE_FILENAME: 'kafka.kafka0.truststore.jks'
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: credentials.txt
+      KAFKA_SSL_KEY_CREDENTIALS: credentials.txt
+      KAFKA_SSL_CLIENT_AUTH: required
+      KAFKA_SSL_PROTOCOL: TLSv1.2
+
+      #zookeeper
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka0.keystore.jks
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka0.truststore.jks
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_KEYSTORE_FILENAME: 'kafka.kafka0.keystore.jks'
+      ZOOKEEPER_SSL_KEYSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SSL_TRUSTSTORE_FILENAME: 'kafka.kafka0.truststore.jks'
+      ZOOKEEPER_SSL_TRUSTSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_CLIENT_SECURE: true
+      ZOOKEEPER_CLIENT_CNXN_FACTORY: org.apache.zookeeper.ClientCnxnSocketNetty
+      ZOOKEEPER_SSL_PROTOCOL: TLSv1.2
+      ZOOKEEPER_SET_ACL: true
+
+    volumes:
+      - /Users/wojdylakjr/Erasmus2023/CloudComputing/Project/security/ssl:/etc/kafka/secrets
+
+  kafka-2:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - 39092:39092
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:9092, EXTERNAL://localhost:39092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SSL,EXTERNAL:SSL
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      
+      #kafka clients
+      KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka1.keystore.jks
+      KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka1.truststore.jks
+      KAFKA_SSL_KEYSTORE_PASSWORD: QV9F(HOhfkjs*
+      KAFKA_SSL_TRUSTSTORE_PASSWORD: QV9F(HOhfkjs*
+      KAFKA_SSL_PASSWORD: QV9F(HOhfkjs*
+      KAFKA_SECURITY_PROTOCOL: SSL
+      SECURITY_PROTOCOL: SSL
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: " "
+      KAFKA_SSL_KEYSTORE_FILENAME: 'kafka.kafka1.keystore.jks'
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: credentials.txt
+      KAFKA_SSL_TRUSTSTORE_FILENAME: 'kafka.kafka1.truststore.jks'
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: credentials.txt
+      KAFKA_SSL_KEY_CREDENTIALS: credentials.txt
+      KAFKA_SSL_CLIENT_AUTH: required
+      KAFKA_SSL_PROTOCOL: TLSv1.2
+      #zookeeper
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka1.keystore.jks
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka1.truststore.jks
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_KEYSTORE_FILENAME: 'kafka.kafka1.keystore.jks'
+      ZOOKEEPER_SSL_KEYSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SSL_TRUSTSTORE_FILENAME: 'kafka.kafka1.truststore.jks'
+      ZOOKEEPER_SSL_TRUSTSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_CLIENT_SECURE: true
+      ZOOKEEPER_CLIENT_CNXN_FACTORY: org.apache.zookeeper.ClientCnxnSocketNetty
+      ZOOKEEPER_SSL_PROTOCOL: TLSv1.2
+      ZOOKEEPER_SET_ACL: true
+
+    volumes:
+      - /Users/wojdylakjr/Erasmus2023/CloudComputing/Project/security/ssl:/etc/kafka/secrets
+
+
+  kafka-3:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - 49092:49092
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:9092, EXTERNAL://localhost:49092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:SSL,EXTERNAL:SSL
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      
+      #kafka clients
+      KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka2.keystore.jks
+      KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka2.truststore.jks
+      KAFKA_SSL_KEYSTORE_PASSWORD: QV9F(HOhfkjs*
+      KAFKA_SSL_TRUSTSTORE_PASSWORD: QV9F(HOhfkjs*
+      KAFKA_SSL_PASSWORD: QV9F(HOhfkjs*
+      KAFKA_SECURITY_PROTOCOL: SSL
+      SECURITY_PROTOCOL: SSL
+      KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: " "
+      KAFKA_SSL_KEYSTORE_FILENAME: 'kafka.kafka2.keystore.jks'
+      KAFKA_SSL_KEYSTORE_CREDENTIALS: credentials.txt
+      KAFKA_SSL_TRUSTSTORE_FILENAME: 'kafka.kafka2.truststore.jks'
+      KAFKA_SSL_TRUSTSTORE_CREDENTIALS: credentials.txt
+      KAFKA_SSL_KEY_CREDENTIALS: credentials.txt
+      KAFKA_SSL_CLIENT_AUTH: required
+      KAFKA_SSL_PROTOCOL: TLSv1.2
+      #zookeeper
+      ZOOKEEPER_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka2.keystore.jks
+      ZOOKEEPER_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.kafka2.truststore.jks
+      ZOOKEEPER_SSL_KEYSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_TRUSTSTORE_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_PASSWORD: QV9F(HOhfkjs*
+      ZOOKEEPER_SSL_KEYSTORE_FILENAME: 'kafka.kafka2.keystore.jks'
+      ZOOKEEPER_SSL_KEYSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_SSL_TRUSTSTORE_FILENAME: 'kafka.kafka2.truststore.jks'
+      ZOOKEEPER_SSL_TRUSTSTORE_CREDENTIALS: credentials.txt
+      ZOOKEEPER_CLIENT_SECURE: true
+      ZOOKEEPER_CLIENT_CNXN_FACTORY: org.apache.zookeeper.ClientCnxnSocketNetty
+      ZOOKEEPER_SSL_PROTOCOL: TLSv1.2
+      ZOOKEEPER_SET_ACL: true
+
+    volumes:
+      - /Users/wojdylakjr/Erasmus2023/CloudComputing/Project/security/ssl:/etc/kafka/secrets
